@@ -32,6 +32,12 @@ public class UIPanel extends JPanel implements Observer {
         this.scoreLabel.setText("Score: " + score);
     }
 
+    // 게임 시작 또는 재시작 시 점수 초기화
+    public void resetScore() {
+        this.score = 0;
+        this.scoreLabel.setText("Score: " + score);
+    }
+
     public int getScore() {
         return score;
     }
