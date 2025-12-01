@@ -2,6 +2,9 @@ package game.entities.ghosts;
 
 import game.Game;
 import game.entities.MovingEntity;
+import game.ghostStatStrategies.EmpoweredStatStrategy;
+import game.ghostStatStrategies.IGhostStatStrategy;
+import game.ghostStatStrategies.NormalStatStrategy;
 import game.ghostStates.*;
 import game.ghostStrategies.IGhostStrategy;
 
@@ -29,6 +32,7 @@ public abstract class Ghost extends MovingEntity {
     protected static BufferedImage eatenSprite;
 
     protected IGhostStrategy strategy;
+    protected IGhostStatStrategy statStrategy = new NormalStatStrategy();
 
     public Ghost(int xPos, int yPos, String spriteName) {
         super(32, xPos, yPos, 2, spriteName, 2, 0.1f);
@@ -88,6 +92,14 @@ public abstract class Ghost extends MovingEntity {
         this.strategy = strategy;
     }
 
+    public IGhostStatStrategy getStatStrategy() {
+        return this.statStrategy;
+    }
+
+    public void setStatStrategy(IGhostStatStrategy statStrategy) {
+        this.statStrategy = statStrategy;
+    }
+
     public GhostState getState() {
         return state;
     }
@@ -95,6 +107,11 @@ public abstract class Ghost extends MovingEntity {
     @Override
     public void update() {
         if (!Game.getFirstInput()) return; //Les fantômes ne bougent pas tant que le joueur n'a pas bougé
+
+        // 유령이 팩맨을 10초 이상 쫓으면 강화됨
+        if (modeTimer >= (60 * 10)) {
+            setStatStrategy(new EmpoweredStatStrategy());
+        }
 
         //Si le fantôme est dans l'état effrayé, un timer de 7s se lance, et l'état sera notifié ensuite afin d'appliquer la transition adéquate
         if (state == frightenedMode) {
@@ -109,9 +126,11 @@ public abstract class Ghost extends MovingEntity {
         //Si le fantôme est dans l'état chaseMode ou scatterMode, un timer se lance, et au bout de 5s ou 20s selon l'état, l'état est notifié ensuite afin d'appliquer la transition adéquate
         if (state == chaseMode || state == scatterMode) {
             modeTimer++;
+            System.out.println(modeTimer);
 
             if ((isChasing && modeTimer >= (60 * 20)) || (!isChasing && modeTimer >= (60 * 5))) {
                 state.timerModeOver();
+
                 isChasing = !isChasing;
             }
         }
@@ -126,9 +145,11 @@ public abstract class Ghost extends MovingEntity {
             state.insideHouse();
         }
 
-        //Selon l'état, le fantôme calcule sa prochaine direction, et sa position est ensuite mise à jour
-        state.computeNextDir();
-        updatePosition();
+        int loopCount = statStrategy.getSpeedMultiplier();
+        for(int i=0; i<loopCount; i++) {
+            state.computeNextDir();
+            updatePosition();
+        }
     }
 
     @Override
