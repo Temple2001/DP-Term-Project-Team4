@@ -15,15 +15,18 @@ public class InkyStrategy implements IGhostStrategy{
         this.otherGhost = ghost;
     }
 
-    //Inky se base sur la position de Blinky pour cibler Pacman : on prend un vecteur entre la position de Blinky et une case devant Pacman, et additionne ce vecteur à la position une case devant Pacman pour obtenir la cible d'Inky
     @Override
     public Position getChaseTargetPosition() {
-        int[] pacmanFacingPosition = Utils.getPointDistanceDirection(Game.getPacman().getXPos(), Game.getPacman().getYPos(), 32d, Utils.directionConverter(Game.getPacman().getDirection()));
-        double distanceOtherGhost = Utils.getDistance(pacmanFacingPosition[0], pacmanFacingPosition[1], otherGhost.getXPos(), otherGhost.getYPos());
-        double directionOtherGhost = Utils.getDirection(otherGhost.getXPos(), otherGhost.getYPos(), pacmanFacingPosition[0], pacmanFacingPosition[1]);
-        int[] blinkyVectorPosition = Utils.getPointDistanceDirection(pacmanFacingPosition[0], pacmanFacingPosition[1], distanceOtherGhost, directionOtherGhost);
+        var pacman = Game.getPacman();
+        Position pacmanPos = pacman.getPosition();
+        Position blinkyPos = otherGhost.getPosition();
+        double pacmanDir = Utils.directionConverter(pacman.getDirection());
 
-        return new Position(blinkyVectorPosition[0], blinkyVectorPosition[1]);
+        // Pivot 포인트 계산 (팩맨 위치에서 32만큼 앞선 곳)
+        Position pivotPoint = pacmanPos.move(32.0, pacmanDir);
+
+        // 최종 타겟 계산 (Blinky 위치를 Pivot 기준으로 반전)
+        return blinkyPos.reflectAround(pivotPoint);
     }
 
     //En pause, Inky cible la case en bas à droite
