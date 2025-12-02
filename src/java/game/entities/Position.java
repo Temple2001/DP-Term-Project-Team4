@@ -23,12 +23,6 @@ public class Position {
         this.y = y;
     }
 
-    // 다른 Position의 값으로 내 값을 덮어쓰기 (복사)
-    public void set(Position other) {
-        this.x = other.x;
-        this.y = other.y;
-    }
-
     // 현재 위치에서 상대적으로 이동 (예: x+1, y+0)
     public void translate(int dx, int dy) {
         this.x += dx;
@@ -60,10 +54,5 @@ public class Position {
         int vectorX = pivot.x - this.x;
         int vectorY = pivot.y - this.y;
         return new Position(pivot.x + vectorX, pivot.y + vectorY);
-    }
-
-    // 기존 코드 호환용 (int 배열 반환)
-    public int[] toArray() {
-        return new int[]{x, y};
     }
 }
