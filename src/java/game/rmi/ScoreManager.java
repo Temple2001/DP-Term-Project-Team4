@@ -28,9 +28,6 @@ public class ScoreManager extends UnicastRemoteObject implements ScoreService {
 
     private ScoreManager() throws RemoteException {
         super();
-        if (SingletonHolder.INSTANCE != null) {
-            throw new RuntimeException("Wrong Access. Use getInstance() method to get the single instance of this class.");
-        }
         scores = new ArrayList<>();
     }
 
@@ -46,7 +43,7 @@ public class ScoreManager extends UnicastRemoteObject implements ScoreService {
         }
     }
 
-    public static synchronized ScoreManager getInstance() {
+    public static ScoreManager getInstance() {
         return SingletonHolder.INSTANCE;
     }
 
